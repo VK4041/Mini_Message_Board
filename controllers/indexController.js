@@ -1,29 +1,24 @@
-const messages = [
-  {
-    text: "Hi there!",
-    user: "Amando",
-    added: new Date(),
-  },
-  {
-    text: "Hello World!",
-    user: "Charles",
-    added: new Date(),
-  },
-];
+const db = require("../db/queries");
 
 module.exports = {
-  get: (req, res) => {
-    res.render("index", { title: "Mini Messageboard", messages: messages });
+  get: async (req, res) => {
+    //Fetch from database
+    const messages = await db.fetchMessages();
+    res.render("index", {
+      title: "Mini Messageboard",
+      messages: messages,
+    });
   },
   getNew: (req, res) => {
     res.render("form");
   },
-  postNew: (req, res) => {
-    messages.push({
+  postNew: async (req, res) => {
+    const message = {
       text: req.body.text,
-      user: req.body.author,
+      username: req.body.author,
       added: new Date(),
-    });
+    };
+    await db.storeMessage(message);
     res.redirect("/");
   },
 };
